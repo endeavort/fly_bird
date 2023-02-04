@@ -26,6 +26,9 @@ THUNDER_SPEED = 6  # 雷の落下速度レベル（THUNDER_MAX~1の範囲,1に�
 bg_posy = 0  # 背景の中心のy座標
 px, py = 240, 540  # プレイヤーの位置座標（値は初期位置）
 tx, ty = [0] * THUNDER_MAX, [0] * THUNDER_MAX  # 雷の位置座標（最大数分）
+count = 0  # ゲームカウント
+score = 0  # スコア
+highscore = 0  # ハイスコア
 phase = 0  # フェーズ
 # 0:タイトル
 # 1:ゲームプレイ中
@@ -77,12 +80,14 @@ def move_player():
 # 初期設定
 def game_init():
     # グローバル変数
-    global px, py
+    global px, py, count, score
     px, py = 240, 540  # プレイヤー初期位置
     # 雷初期位置
     for i in range(THUNDER_MAX):
         tx[i] = random.randint(0, 480)  # x座標を0~480の範囲でランダムに決める
         ty[i] = random.randint(-640, 0)  # y座標を-640~0の範囲でランダムに決める
+    count = 0  # カウンター初期設定
+    score = 0  # スコア初期設定
 
 
 # 雷の移動処理
@@ -110,7 +115,8 @@ def hit_thunder(x1, y1, x2, y2):
 # メイン処理
 def main():
     # グローバル変数
-    global bg_posy, key, key_off, phase
+    global bg_posy, key, key_off, phase, count, score, highscore
+    count += 1  # カウントを1ずつ増やす
     bg_posy = (bg_posy + 1) % 640  # 背景の中心のy座標(0~639)
     canvas.delete("SCREEN")  # キャンバス上のSCREENタグの画像を全て削除
     # 背景の描画（中心のx座標, 中心のy座標, 画像, タグ)
@@ -120,13 +126,13 @@ def main():
     if phase == 0:
         # テキストの描画(中心のx座標, 中心のy座標, テキスト, 色, フォント, タグ)
         canvas.create_text(
-            240, 240, text="Fly Bird", fill="darkblue", font=large_font, tag="SCREEN"
+            240, 240, text="Fly Bird", fill="red", font=large_font, tag="SCREEN"
         )
         canvas.create_text(
             240,
             480,
             text="Press [SPACE] Key",
-            fill="darkblue",
+            fill="red",
             font=large_font,
             tag="SCREEN",
         )
@@ -141,19 +147,68 @@ def main():
         move_player()
         # 雷処理
         move_thunder()
+        # スコアの加算
+        score += 1
 
     # ゲームオーバーの時
     if phase == 2:
         move_thunder()
+        # ゲームオーバー画像の描画
         canvas.create_image(px, py, image=gameover_img, tag="SCREEN")
+        # ゲームオーバーテキストの描画
         canvas.create_text(
-            240, 240, text="GAME OVER", fill="red", font=large_font, tag="SCREEN"
+            240, 240, text="GAME OVER", fill="black", font=large_font, tag="SCREEN"
         )
+        if score > highscore:
+            canvas.create_text(
+                240,
+                290,
+                text="NEW RECORD",
+                fill="red",
+                font=large_font,
+                tag="SCREEN",
+            )
+        canvas.create_text(
+            240,
+            480,
+            text="Press [SPACE] Key",
+            fill="red",
+            font=large_font,
+            tag="SCREEN",
+        )
+
+        # スペースキーが押された時
+        if key == "space":
+            phase = 0  # フェーズをタイトルに
+            key = ""
+            # ハイスコアの更新
+            if score > highscore:
+                highscore = score
 
     # キーが押されていない時、キーの操作を初期値にする
     if key_off == True:
         key = ""
         key_off = False
+
+    # スコアの描画
+    canvas.create_text(
+        400,
+        20,
+        text=f"SCORE:{score:>5}",
+        fill="red",
+        font=small_font,
+        tag="SCREEN",
+    )
+
+    # ハイスコアの描画
+    canvas.create_text(
+        100,
+        20,
+        text=f"HIGHSCORE:{highscore:>5}",
+        fill="red",
+        font=small_font,
+        tag="SCREEN",
+    )
     # 50m秒後にmainを再び実行
     window.after(50, main)
 
