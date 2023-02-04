@@ -79,8 +79,17 @@ def move_thunder():
         if ty[i] > 660:
             tx[i] = random.randint(0, 480)  # x座標を0~480の範囲でランダムに決める
             ty[i] = random.randint(-640, 0)  # y座標を-640~0の範囲でランダムに決める
+        if hit_thunder(px, py, tx[i], ty[i]):
+            print("hit")
         # 雷の描画
         canvas.create_image(tx[i], ty[i], image=thunder_img, tag="SCREEN")
+
+
+# 接触判定
+def hit_thunder(x1, y1, x2, y2):
+    if ((x1 - x2) ** 2 + (y1 - y2) ** 2) < 36**2:
+        return True
+    return False
 
 
 # メイン処理
