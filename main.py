@@ -8,9 +8,19 @@ canvas = tkinter.Canvas(width=480, height=640)  # キャンバスの設定(図�
 canvas.pack()  # キャンバスの配置
 
 bg_img = tkinter.PhotoImage(file="img/bg.png")  # 背景画像の読み込み
+player_img = tkinter.PhotoImage(file="img/bird.png")  # プレイヤー画像の読み込み
 
 # ===========  変数  ==============
-bg_posy = 0
+bg_posy = 0  # 背景の中心のy座標
+px, py = 240, 540  # プレイヤーの位置座標（値は初期位置）
+
+# プレイヤーの移動処理
+def move_player():
+    # グローバル変数
+    global px, py
+    # プレイヤーの描画
+    canvas.create_image(px, py, image=player_img, tag="SCREEN")
+
 
 # メイン処理
 def main():
@@ -21,6 +31,8 @@ def main():
     # 背景の描画（中心のx座標, 中心のy座標, 画像, タグ)
     canvas.create_image(240, bg_posy - 320, image=bg_img, tag="SCREEN")
     canvas.create_image(240, bg_posy + 320, image=bg_img, tag="SCREEN")
+    # プレイヤー処理
+    move_player()
     # 50m秒後にmainを再び実行
     window.after(50, main)
 
